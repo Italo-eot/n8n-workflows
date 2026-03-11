@@ -1,0 +1,336 @@
+{
+  "name": "Despesas_Viagem",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -336,
+        -176
+      ],
+      "id": "db91c2cf-2b3a-4f72-bdff-f252f7e5edbb",
+      "name": "When chat message received",
+      "webhookId": "39fed934-2107-481d-8a7e-11bc011639c1"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Você é um agente de IA autônomo, criado para atuar como um assistente financeiro digital. \nApenas registre despesas. Não responda perguntas fora deste escopo.  \nSe for questionado sobre assuntos como clima, esportes ou política, diga gentilmente que só pode ajudar com registro de gastos.\n\nSe perguntar sobre a última compra feita, gentileza informar.\n\nLançamento o valor em euro, realizar a conversão em real de acordo com a última cotação."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        256,
+        -176
+      ],
+      "id": "599f2c2a-d24c-41f4-be58-194007ec0adc",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        48,
+        64
+      ],
+      "id": "c327858a-9ce1-4fd6-ba1b-c2c0d216c469",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1iJEnbv4GUsqRHySHwlXzSlnxLxuTVJtIQ2pABkmmIgU",
+          "mode": "list",
+          "cachedResultName": "Despesas_n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1iJEnbv4GUsqRHySHwlXzSlnxLxuTVJtIQ2pABkmmIgU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1iJEnbv4GUsqRHySHwlXzSlnxLxuTVJtIQ2pABkmmIgU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Item": "={{ $fromAI('Item', ``, 'string') }}",
+            "Valor": "={{ $fromAI('Valor', ``, 'string') }}",
+            "Fornecedor": "={{ $fromAI('Fornecedor', ``, 'string') }}",
+            "Despesa": "={{ $fromAI('Despesa', ``, 'string') }}",
+            "Date": "={{ $fromAI('Date', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Item",
+              "displayName": "Item",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Valor",
+              "displayName": "Valor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fornecedor",
+              "displayName": "Fornecedor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Despesa",
+              "displayName": "Despesa",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        736,
+        144
+      ],
+      "id": "267d78ae-61fe-4903-bdd2-01d283607ab7",
+      "name": "Append row in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "30QgNb7o5kup6niQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-safeguard-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        64
+      ],
+      "id": "2a5e5ce3-e4aa-4e59-bf5b-a469eec621ee",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "tNAnTko29W9RnRM7",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.frankfurter.dev/v1/latest?from=EUR&to=BRL",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.4,
+      "position": [
+        560,
+        288
+      ],
+      "id": "9d7e1649-5973-4f65-8dee-95e3b9f3c848",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const workflowJson = {\n  \"name\": \"Despesas_Viagem\",\n  \"nodes\": [\n    // ... todo o seu workflow aqui\n  ]\n};\n\n// Converter para string JSON e depois para Base64\nconst workflowString = JSON.stringify(workflowJson, null, 2);\nconst workflowBase64 = Buffer.from(workflowString).toString('base64');\n\nreturn [{\n  json: {\n    message: \"Adicionando workflow de conversão de despesas - \" + new Date().toISOString().split('T')[0],\n    content: workflowBase64,  // Aqui está o Base64 correto!\n    branch: \"main\"\n  }\n}];"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        64
+      ],
+      "id": "a1ae1da7-9d9f-4f1d-b15c-4fdfe7d5f159",
+      "name": "Code Tool"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "https://api.github.com/repos/Italo-eot/n8n-workflows/contents/currency-converter/workflow.json",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer ghp_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"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"message\": \"Adicionando workflow de conversão de despesas\",\n  \"content\": \"SUA_STRING_BASE64_AQUI\",\n  \"branch\": \"main\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.4,
+      "position": [
+        432,
+        576
+      ],
+      "id": "093b4aba-ad9d-4609-bf5e-90d7741b7953",
+      "name": "Commit Github"
+    },
+    {
+      "parameters": {
+        "url": "=http://localhost:5678/rest/workflows/{{$workflow.id}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.4,
+      "position": [
+        240,
+        400
+      ],
+      "id": "f009846e-bc01-4e7e-98a3-ec91d09a498f",
+      "name": "Get Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Commit Github": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Workflow": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "49e0f15d-1332-4211-bcb9-4fef7d093243",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3e4a80589626d2f5d80a0b2c85fe94c1c94ccaccf6d3611512e962256afd1663"
+  },
+  "id": "FNJWxmuBH7ZuIvFz",
+  "tags": []
+}
